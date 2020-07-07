@@ -19,8 +19,21 @@ function Ball:reset()
 end
 
 function Ball:update(dt)
+
     self.x = self.x + self.dx*dt
     self.y = self.y + self.dy*dt
+
+    if self.y <= 0 then
+        self.y = 0
+        self.dy = -self.dy
+        sounds['wall_hit']:play()
+
+    elseif self.y >= VIRTUAL_HEIGHT - BALL_HEIGHT then
+        self.y = VIRTUAL_HEIGHT - BALL_HEIGHT
+        self.dy = -self.dy
+        sounds['wall_hit']:play()
+    end
+
 end
 
 function Ball:collides(paddle)
@@ -29,9 +42,18 @@ function Ball:collides(paddle)
     end
     if self.y > paddle.y + paddle.height or self.y + self.height < paddle.y then
         return false
-    end
+    else
+        sounds['paddle_hit']:play()
+        self.dx = -self.dx*1.03
 
-    return true
+        if self.dy < 0 then
+            self.dy = -math.random(10, 150)
+        else
+            self.dy = math.random(10, 150)
+        end
+        
+        return true
+    end
 end
 
 function Ball:render()
